@@ -16,6 +16,9 @@ python3.11 -m venv .venv
 # Aktivieren (macOS/Linux)
 source .venv/bin/activate
 
+# Aktivieren (Windows)
+.venv\Scripts\activate
+
 # Abhängigkeiten installieren
 pip install -r requirements.txt
 
