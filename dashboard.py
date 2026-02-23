@@ -26,6 +26,15 @@ PFAND_WERTE = {
     "Kein_Pfand": 0.00
 }
 
+ANZEIGE_NAMEN = {
+    "PET_Einweg": "PET Einweg",
+    "PET_Mehrweg": "PET Mehrweg",
+    "Dose": "Dose",
+    "Glas": "Glas",
+    "Glas_Buegel": "Glas mit Bügelverschluss",
+    "Kein_Pfand": "Kein Pfand"
+}
+
 # ===== SEITEN-KONFIGURATION =====
 st.set_page_config(
     page_title="TrustPfand",
@@ -145,8 +154,9 @@ def live_camera_feed(confidence):
     st.image(jpg.tobytes(), use_container_width=True)
 
     if detections:
-        det_text = " | ".join(f"**{k}** {ko:.0%}" for k, ko, _ in detections)
-        st.markdown(det_text)
+        for k, ko, p in detections:
+            st.markdown(f"**{ANZEIGE_NAMEN.get(k, k)}** {ko:.0%} — {p:.2f}€")
+        st.caption(f"Erkannter Pfand: **{total_pfand:.2f} €**")
         if st.button("Zum Gesamt hinzufügen", type="primary", use_container_width=True, key="add_live_fragment"):
             for klasse, _, pfand in detections:
                 st.session_state.artikel_liste.append(klasse)
@@ -225,7 +235,7 @@ with st.sidebar:
     # Pfandwerte
     st.subheader("Pfandwerte")
     for klasse, wert in PFAND_WERTE.items():
-        st.caption(f"{klasse}: {wert:.2f} €")
+        st.caption(f"{ANZEIGE_NAMEN.get(klasse, klasse)}: {wert:.2f} €")
 
 # ===== HAUPTBEREICH =====
 col_cam, col_stats = st.columns([2, 1])
@@ -254,7 +264,7 @@ with col_cam:
                 if st.session_state.last_detections:
                     st.subheader("Letzte Erkennung")
                     for klasse, konf, pfand in st.session_state.last_detections:
-                        st.markdown(f"- **{klasse}**: {konf:.0%} → {pfand:.2f} €")
+                        st.markdown(f"- **{ANZEIGE_NAMEN.get(klasse, klasse)}**: {konf:.0%} → {pfand:.2f} €")
                     st.metric("Erkannter Pfand", f"{st.session_state.last_pfand:.2f} €")
                     if st.button("Zum Gesamt hinzufügen", type="primary", width="stretch", key="add_after_stop"):
                         for klasse, _, pfand in st.session_state.last_detections:
@@ -289,7 +299,7 @@ with col_cam:
                 st.subheader("Erkennungen")
                 if detections:
                     for klasse, konf, pfand in detections:
-                        st.markdown(f"- **{klasse}**: {konf:.0%} → {pfand:.2f} €")
+                        st.markdown(f"- **{ANZEIGE_NAMEN.get(klasse, klasse)}**: {konf:.0%} → {pfand:.2f} €")
 
                     st.metric("Pfand in diesem Bild", f"{total_pfand:.2f} €")
 
@@ -329,7 +339,7 @@ with col_stats:
         for klasse, anzahl in counts.most_common():
             wert = PFAND_WERTE.get(klasse, 0) * anzahl
             col1, col2 = st.columns([2, 1])
-            col1.write(f"{klasse}")
+            col1.write(f"{ANZEIGE_NAMEN.get(klasse, klasse)}")
             col2.write(f"**{anzahl}x** ({wert:.2f}€)")
     else:
         st.info("Noch keine Artikel erfasst")
