@@ -184,10 +184,10 @@ def detect_and_annotate(img, conf_threshold, imgsz=640):
     annotated_img = results.plot()
 
     overlay = annotated_img.copy()
-    cv2.rectangle(overlay, (10, 10), (280, 70), (0, 0, 0), -1)
+    cv2.rectangle(overlay, (10, 10), (200, 45), (0, 0, 0), -1)
     annotated_img = cv2.addWeighted(overlay, 0.7, annotated_img, 0.3, 0)
-    cv2.putText(annotated_img, f"Pfand: {total_pfand:.2f} EUR", (20, 50),
-               cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3)
+    cv2.putText(annotated_img, f"Pfand: {total_pfand:.2f} EUR", (15, 35),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
     return annotated_img, detections, total_pfand
 
